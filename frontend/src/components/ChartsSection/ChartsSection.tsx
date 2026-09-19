@@ -13,9 +13,10 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({ analytics, isLoadi
   if (isLoading) {
     return (
       <div
+        className="charts-grid"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))',
           gap: '1.25rem',
           marginBottom: '1.75rem'
         }}
@@ -33,9 +34,10 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({ analytics, isLoadi
 
   return (
     <div
+      className="charts-grid"
       style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))',
         gap: '1.25rem',
         marginBottom: '1.75rem'
       }}

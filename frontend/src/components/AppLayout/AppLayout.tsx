@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
@@ -12,6 +12,7 @@ export const AppLayout: React.FC = () => {
       return false;
     }
   });
+  const [isMobileOpen, setIsMobileOpen] = useState<boolean>(false);
 
   const toggleCollapse = () => {
     setIsCollapsed((prev) => {
@@ -34,8 +35,13 @@ export const AppLayout: React.FC = () => {
         color: 'var(--text-primary)'
       }}
     >
-      {/* Enterprise Collapsible Sidebar */}
-      <Sidebar isCollapsed={isCollapsed} onToggleCollapse={toggleCollapse} />
+      {/* Enterprise Collapsible & Mobile Drawer Sidebar */}
+      <Sidebar
+        isCollapsed={isCollapsed}
+        onToggleCollapse={toggleCollapse}
+        isMobileOpen={isMobileOpen}
+        onCloseMobile={() => setIsMobileOpen(false)}
+      />
 
       {/* Main App Workspace */}
       <div
@@ -47,8 +53,11 @@ export const AppLayout: React.FC = () => {
           overflowX: 'hidden'
         }}
       >
-        {/* Crisp, Non-Wrapping Sticky Top Bar */}
-        <TopBar />
+        {/* Crisp, Non-Wrapping Sticky Top Bar with Mobile Toggle */}
+        <TopBar
+          onToggleMobile={() => setIsMobileOpen((prev) => !prev)}
+          isMobileOpen={isMobileOpen}
+        />
 
         {/* Dynamic Nested Route Page Body */}
         <main
@@ -65,3 +74,4 @@ export const AppLayout: React.FC = () => {
 };
 
 export default AppLayout;
+

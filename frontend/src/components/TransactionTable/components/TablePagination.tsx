@@ -24,6 +24,7 @@ export const TablePagination: React.FC<TablePaginationProps> = ({
 
   return (
     <div
+      className="table-pagination-container"
       style={{
         padding: '1rem 1.5rem',
         borderTop: '1px solid var(--border-subtle)',

@@ -113,7 +113,7 @@ export const TransactionsPage: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '1.75rem 2rem', maxWidth: '1600px', margin: '0 auto', width: '100%' }}>
+    <div className="dashboard-container" style={{ width: '100%' }}>
       {/* Page Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>

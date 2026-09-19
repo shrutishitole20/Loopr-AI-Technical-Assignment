@@ -9,12 +9,19 @@ import {
   LayoutDashboard,
   ReceiptText,
   FileSpreadsheet,
-  Settings
+  Settings,
+  Menu
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 
-export const TopBar: React.FC = () => {
+export interface TopBarProps {
+  onToggleMobile?: () => void;
+  isMobileOpen?: boolean;
+}
+
+export const TopBar: React.FC<TopBarProps> = ({ onToggleMobile, isMobileOpen = false }) => {
+
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -67,6 +74,7 @@ export const TopBar: React.FC = () => {
 
   return (
     <header
+      className="topbar-header"
       style={{
         height: '68px',
         backgroundColor: 'var(--bg-card)',
@@ -83,8 +91,26 @@ export const TopBar: React.FC = () => {
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.03)'
       }}
     >
-      {/* Left: Breadcrumbs & Page title */}
+      {/* Left: Mobile Menu Button + Breadcrumbs & Page title */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        {/* Mobile Hamburger Menu Toggle Button */}
+        <button
+          onClick={onToggleMobile}
+          className="mobile-menu-btn btn btn-secondary btn-sm"
+          style={{
+            display: 'none',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '36px',
+            height: '36px',
+            padding: 0,
+            borderRadius: '10px'
+          }}
+          title={isMobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+        >
+          <Menu size={18} />
+        </button>
+
         <div
           style={{
             width: '32px',
@@ -95,14 +121,15 @@ export const TopBar: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#7ac7ff'
+            color: '#7ac7ff',
+            flexShrink: 0
           }}
         >
           <RouteIcon size={17} />
         </div>
 
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+          <div className="topbar-breadcrumbs" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
             <span>Loopr AI</span>
             <ChevronRight size={12} />
             <span>{routeInfo.section}</span>
@@ -123,7 +150,7 @@ export const TopBar: React.FC = () => {
       </div>
 
       {/* Right: Controls (Single Row, Never Wraps) */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
         {/* Live Status Pill */}
         <div
           style={{
@@ -149,7 +176,7 @@ export const TopBar: React.FC = () => {
               display: 'inline-block'
             }}
           />
-          <span>Live Synced</span>
+          <span className="status-pill-text">Live Synced</span>
         </div>
 
         {/* Theme Toggle Button */}
@@ -204,6 +231,7 @@ export const TopBar: React.FC = () => {
             }}
           />
           <span
+            className="user-chip-name"
             style={{
               fontSize: '0.8rem',
               fontWeight: 600,
@@ -217,6 +245,7 @@ export const TopBar: React.FC = () => {
             {user?.name || 'Analyst'}
           </span>
         </div>
+
 
         {/* Quick Logout Button */}
         <button

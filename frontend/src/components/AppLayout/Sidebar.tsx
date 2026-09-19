@@ -9,7 +9,8 @@ import {
   LogOut,
   ShieldCheck,
   Sparkles,
-  Layers
+  Layers,
+  X
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { LooprIcon } from './LooprLogo';
@@ -17,16 +18,25 @@ import { LooprIcon } from './LooprLogo';
 interface SidebarProps {
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  isCollapsed,
+  onToggleCollapse,
+  isMobileOpen = false,
+  onCloseMobile
+}) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
+    onCloseMobile?.();
     navigate('/login', { replace: true });
   };
+
 
   const navItems = [
     {
@@ -64,35 +74,66 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
   ];
 
   return (
-    <aside
-      style={{
-        width: isCollapsed ? '76px' : '260px',
-        minWidth: isCollapsed ? '76px' : '260px',
-        transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-        backgroundColor: 'var(--bg-card)',
-        borderRight: '1px solid var(--border-subtle)',
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100vh',
-        position: 'sticky',
-        top: 0,
-        zIndex: 50,
-        userSelect: 'none',
-        overflowX: 'hidden'
-      }}
-    >
-      {/* Brand & Collapse Header */}
-      <div
+    <>
+      {/* Mobile Drawer Backdrop Overlay */}
+      {isMobileOpen && (
+        <div
+          className="mobile-sidebar-backdrop"
+          onClick={onCloseMobile}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(10, 13, 29, 0.65)',
+            backdropFilter: 'blur(4px)',
+            WebkitBackdropFilter: 'blur(4px)',
+            zIndex: 998
+          }}
+        />
+      )}
+
+      <aside
+        className={`desktop-sidebar ${isMobileOpen ? 'mobile-sidebar-drawer' : ''}`}
         style={{
-          height: '68px',
+          width: isMobileOpen ? '280px' : isCollapsed ? '76px' : '260px',
+          minWidth: isMobileOpen ? '280px' : isCollapsed ? '76px' : '260px',
+          transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+          backgroundColor: 'var(--bg-card)',
+          borderRight: '1px solid var(--border-subtle)',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: isCollapsed ? 'center' : 'space-between',
-          padding: isCollapsed ? '0 0.5rem' : '0 1.25rem',
-          borderBottom: '1px solid var(--border-subtle)',
-          position: 'relative'
+          flexDirection: 'column',
+          height: '100vh',
+          position: isMobileOpen ? 'fixed' : 'sticky',
+          left: 0,
+          top: 0,
+          zIndex: isMobileOpen ? 999 : 50,
+          boxShadow: isMobileOpen ? '0 0 35px rgba(0, 0, 0, 0.5)' : 'none',
+          userSelect: 'none',
+          overflowX: 'hidden'
         }}
       >
+        {/* Brand & Collapse Header */}
+        <div
+          style={{
+            height: '68px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: isCollapsed && !isMobileOpen ? 'center' : 'space-between',
+            padding: isCollapsed && !isMobileOpen ? '0 0.5rem' : '0 1.25rem',
+            borderBottom: '1px solid var(--border-subtle)',
+            position: 'relative'
+          }}
+        >
+          {isMobileOpen && (
+            <button
+              onClick={onCloseMobile}
+              className="btn btn-secondary btn-sm"
+              style={{ padding: '0.4rem', borderRadius: '8px', minWidth: '32px', height: '32px' }}
+              title="Close menu"
+            >
+              <X size={17} />
+            </button>
+          )}
+
         <div
           onClick={onToggleCollapse}
           title={isCollapsed ? 'Click to expand sidebar' : 'Click to collapse sidebar'}
@@ -192,6 +233,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
               <NavLink
                 key={item.to}
                 to={item.to}
+                onClick={() => onCloseMobile?.()}
                 title={isCollapsed ? item.label : undefined}
                 style={({ isActive }) => ({
                   display: 'flex',
@@ -299,67 +341,36 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
             )}
           </div>
 
-          {!isCollapsed && (
-            <button
-              onClick={handleLogout}
-              title="Logout session"
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-muted)',
-                cursor: 'pointer',
-                padding: '0.4rem',
-                borderRadius: '6px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.15s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = '#e11d48';
-                e.currentTarget.style.backgroundColor = 'rgba(225, 29, 72, 0.1)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'var(--text-muted)';
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }}
-            >
-              <LogOut size={17} />
-            </button>
-          )}
+          <button
+            onClick={handleLogout}
+            title="Logout session"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              padding: '0.45rem',
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: isCollapsed ? '0.4rem' : 0
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#e11d48';
+              e.currentTarget.style.backgroundColor = 'rgba(225, 29, 72, 0.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--text-muted)';
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+          >
+            <LogOut size={16} />
+          </button>
         </div>
-
-        {/* If collapsed, show logout below avatar */}
-        {isCollapsed && (
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '0.5rem' }}>
-            <button
-              onClick={handleLogout}
-              title="Logout session"
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-muted)',
-                cursor: 'pointer',
-                padding: '0.4rem',
-                borderRadius: '6px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = '#e11d48';
-                e.currentTarget.style.backgroundColor = 'rgba(225, 29, 72, 0.1)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'var(--text-muted)';
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }}
-            >
-              <LogOut size={16} />
-            </button>
-          </div>
-        )}
       </div>
     </aside>
+  </>
   );
 };
+

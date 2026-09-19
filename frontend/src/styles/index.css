@@ -298,9 +298,77 @@ body {
   animation: pulseGlow 2s infinite ease-in-out;
 }
 
-/* Responsive Auth Layout */
+/* Responsive Layout & Screen Adjustments */
 @media (max-width: 860px) {
   .auth-showcase-panel {
     display: none !important;
   }
 }
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem 0.75rem 2.5rem 0.75rem;
+  }
+
+  .desktop-sidebar {
+    display: none !important;
+  }
+
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+
+  .topbar-breadcrumbs {
+    display: none !important;
+  }
+
+  .status-pill-text {
+    display: none !important;
+  }
+
+  .user-chip-name {
+    display: none !important;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .table-pagination-container {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-sidebar-drawer,
+  .mobile-sidebar-backdrop {
+    display: none !important;
+  }
+
+  .mobile-menu-btn {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: 0.75rem 0.5rem 2rem 0.5rem;
+  }
+
+  .topbar-header {
+    padding: 0 0.75rem !important;
+  }
+
+  .btn {
+    padding: 0.5rem 0.85rem;
+    font-size: 0.8rem;
+  }
+
+  .modal-dialog {
+    padding: 0.75rem !important;
+    border-radius: 14px !important;
+  }
+}
+
