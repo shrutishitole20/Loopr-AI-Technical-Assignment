@@ -1,0 +1,405 @@
+{
+  "info": {
+    "_postman_id": "7f8b9a1c-3e4d-4a5b-9c8d-1e2f3a4b5c6d",
+    "name": "Loopr AI - Financial Analytics API",
+    "description": "Complete Postman collection for Loopr AI Technical Assignment. Includes automated JWT token capture, comprehensive query parameters, and RFC 4180 CSV export tests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. System",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Checks server health and uptime status."
+          },
+          "response": []
+        },
+        {
+          "name": "API Index Discovery",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"],
+              "path": []
+            },
+            "description": "Lists all available API service routes."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Authentication",
+      "item": [
+        {
+          "name": "Login (Auto-Saves JWT Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Token exists\", function () {",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    pm.collectionVariables.set(\"token\", jsonData.token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@crackit.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Authenticates user and auto-saves the JWT token into collection variables."
+          },
+          "response": []
+        },
+        {
+          "name": "Register New Analyst",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Senior Analyst\",\n  \"email\": \"analyst_test@crackit.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Registers a new user and returns user info with auth token."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Authenticated Profile (Me)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Returns current logged in user details."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Transactions",
+      "item": [
+        {
+          "name": "List Transactions (Paginated)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?page=1&limit=10&sortBy=date&sortOrder=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["transactions"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "sortBy", "value": "date" },
+                { "key": "sortOrder", "value": "desc" }
+              ]
+            },
+            "description": "Retrieves paginated ledger entries with summary stats and active users."
+          },
+          "response": []
+        },
+        {
+          "name": "Filter by Category & Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?category=Revenue&status=Paid&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["transactions"],
+              "query": [
+                { "key": "category", "value": "Revenue" },
+                { "key": "status", "value": "Paid" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            },
+            "description": "Filters transactions by category and status."
+          },
+          "response": []
+        },
+        {
+          "name": "Filter by Date & Amount Range",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?startDate=2024-01-01&endDate=2024-12-31&minAmount=1000&maxAmount=3000",
+              "host": ["{{baseUrl}}"],
+              "path": ["transactions"],
+              "query": [
+                { "key": "startDate", "value": "2024-01-01" },
+                { "key": "endDate", "value": "2024-12-31" },
+                { "key": "minAmount", "value": "1000" },
+                { "key": "maxAmount", "value": "3000" }
+              ]
+            },
+            "description": "Filters transactions by date range and amount bounds."
+          },
+          "response": []
+        },
+        {
+          "name": "Search Transactions",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?search=user_001&limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["transactions"],
+              "query": [
+                { "key": "search", "value": "user_001" },
+                { "key": "limit", "value": "5" }
+              ]
+            },
+            "description": "Real-time search across transaction fields."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Transaction By ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/24",
+              "host": ["{{baseUrl}}"],
+              "path": ["transactions", "24"]
+            },
+            "description": "Retrieves a single transaction by its numeric ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Export CSV (Configurable Columns)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"columns\": [\"id\", \"date\", \"amount\", \"category\", \"status\", \"user_id\"],\n  \"filters\": {\n    \"category\": \"Revenue\",\n    \"status\": \"Paid\"\n  },\n  \"exportAll\": true,\n  \"fileName\": \"financial_audit_export\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions/export",
+              "host": ["{{baseUrl}}"],
+              "path": ["transactions", "export"]
+            },
+            "description": "Generates RFC 4180 standard CSV download with customized columns."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Analytics & Visualizations",
+      "item": [
+        {
+          "name": "Complete Analytics Dataset",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics"]
+            },
+            "description": "Aggregates summary totals, monthly trends, category percentages, and per-user activity."
+          },
+          "response": []
+        },
+        {
+          "name": "Quick KPI Summary",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "summary"]
+            },
+            "description": "High-performance overview of total revenue, expense, margin, and paid ratio."
+          },
+          "response": []
+        },
+        {
+          "name": "Monthly Cashflow Trends",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/trends",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "trends"]
+            },
+            "description": "12-month trajectory dataset for Area/Bar charts."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
